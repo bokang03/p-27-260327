@@ -7,12 +7,12 @@ public record RsData<T>(
         String resultCode,
         T data
 ) {
-    public RsData(String msg, String resultCode){
+    public RsData(String msg, String resultCode) {
         this(msg, resultCode, null);
     }
 
     @JsonIgnore
-    public int getStatusCode(){
+    public int getStatusCode() {
         return Integer.parseInt(resultCode.split("-")[0]);
     }
 }
