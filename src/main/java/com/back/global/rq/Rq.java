@@ -13,7 +13,7 @@ import org.springframework.web.context.annotation.RequestScope;
 @RequiredArgsConstructor
 public class Rq {
 
-    private final HttpServletRequest request;
+    private final HttpServletRequest request; // requestScope
     private final MemberService memberService;
 
     public Member getActor() {
