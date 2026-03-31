@@ -172,4 +172,5 @@ public class ApiV1MemberControllerTest {
     void t5() throws Exception {
         Member actor = memberRepository.findByUsername("user1").get();
         String actorApiKey = actor.getApiKey();
+    }
 }
