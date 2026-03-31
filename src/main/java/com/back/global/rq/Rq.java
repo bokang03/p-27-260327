@@ -21,8 +21,14 @@ public class Rq {
 
 
     public void addCookie(String name, String value) {
+
+        Cookie cookie = new Cookie(name, value);
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        cookie.setDomain("localhost");
+
         response.addCookie(
-                new Cookie(name, value)
+                cookie
         );
     }
 
