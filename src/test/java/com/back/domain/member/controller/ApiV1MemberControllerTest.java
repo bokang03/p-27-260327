@@ -127,7 +127,8 @@ public class ApiV1MemberControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.resultCode").value("200-1"))
                 .andExpect(jsonPath("$.msg").value("%s님 환영합니다.".formatted(member.getNickname())))
-                .andExpect(jsonPath("$.data.apiKey").exists());
+                .andExpect(jsonPath("$.data.apiKey").exists())
+                .andExpect(jsonPath("$.data.accessToken").isNotEmpty());
 
         resultActions.andExpect(
                 result -> {
@@ -140,10 +141,18 @@ public class ApiV1MemberControllerTest {
                     assertThat(apiKeyCookie.isHttpOnly()).isTrue();
                     assertThat(apiKeyCookie.getDomain()).isEqualTo("localhost");
 
+
+                    Cookie accessTokenCookie = result.getResponse().getCookie("accessToken");
+                    assertThat(accessTokenCookie).isNotNull();
+
+                    assertThat(accessTokenCookie.getPath()).isEqualTo("/");
+                    assertThat(accessTokenCookie.getDomain()).isEqualTo("localhost");
+                    assertThat(accessTokenCookie.isHttpOnly()).isEqualTo(true);
                 }
         );
     }
 
+    @Test
     @DisplayName("로그아웃")
     void t4() throws Exception {
         ResultActions resultActions = mvc
@@ -172,5 +181,23 @@ public class ApiV1MemberControllerTest {
     void t5() throws Exception {
         Member actor = memberRepository.findByUsername("user1").get();
         String actorApiKey = actor.getApiKey();
+
+        ResultActions resultActions = mvc
+                .perform(
+                        get("/api/v1/members/me")
+                                .header("Authorization", "Bearer " + actorApiKey)
+                )
+                .andDo(print());
+
+        Member member = memberRepository.findByUsername("user1").get();
+
+        resultActions
+                .andExpect(handler().handlerType(ApiV1MemberController.class))
+                .andExpect(handler().methodName("me"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(member.getId()))
+                .andExpect(jsonPath("$.createDate").exists())
+                .andExpect(jsonPath("$.modifyDate").exists())
+                .andExpect(jsonPath("$.name").value(member.getName()));
     }
 }
