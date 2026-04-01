@@ -24,14 +24,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional
 public class AuthTokenServiceTest {
 
-    private String secretPattern = "abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890";
-    private long expireSeconds = 1000L * 60 * 60 * 24 * 365;
+    @Autowired
+    private AuthTokenService authTokenService;
 
     @Autowired
     private MemberRepository memberRepository;
 
-    @Autowired
-    private AuthTokenService authTokenService;
+    private String secretPattern = "abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890";
+    private long expireSeconds = 1000L * 60 * 60 * 24 * 365; // 1년
 
     @Test
     void t1() {
@@ -40,7 +40,7 @@ public class AuthTokenServiceTest {
 
     @Test
     @DisplayName("jjwt 최신 방식으로 JWT 생성, {name=\"Paul\", age=23}")
-    void t2() {
+    void t2() throws InterruptedException {
         // 토큰 만료기간: 1년
         long expireMillis = 1000L * 60 * 60 * 24 * 365;
 
@@ -51,14 +51,32 @@ public class AuthTokenServiceTest {
         Date issuedAt = new Date();
         Date expiration = new Date(issuedAt.getTime() + expireMillis);
 
+        Map<String, Object> payload = Map.of("name", "Paul", "age", 23);
+
+        // 발급
         String jwt = Jwts.builder()
-                .claims(Map.of("name", "Paul", "age", 23)) // 내용
+                .claims(payload) // 내용
                 .issuedAt(issuedAt) // 생성날짜
                 .expiration(expiration) // 만료날짜
                 .signWith(secretKey) // 키 서명
                 .compact();
 
+        byte[] keyBytes2 = "abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890sdfgdfg".getBytes(StandardCharsets.UTF_8);
+        SecretKey secretKey2 = Keys.hmacShaKeyFor(keyBytes2);
+
+        // jwt 확인(파싱)
+        Map<String, Object> parsedPayload = (Map<String, Object>) Jwts
+                .parser()
+                .verifyWith(secretKey2)
+                .build()
+                .parse(jwt)
+                .getPayload();
+
+        assertThat(parsedPayload)
+                .containsAllEntriesOf(payload);
+
         assertThat(jwt).isNotBlank();
+
 
         System.out.println("jwt = " + jwt);
     }
@@ -73,6 +91,9 @@ public class AuthTokenServiceTest {
         );
 
         assertThat(jwt).isNotBlank();
+
+        boolean rst = Ut.jwt.isValid(jwt, secretPattern);
+        assertThat(rst).isTrue();
 
         System.out.println("jwt = " + jwt);
     }
