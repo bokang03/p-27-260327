@@ -1,7 +1,8 @@
-package com.back.domain.post.post.controller;
+package com.back.domain.post.controller;
 
 import com.back.domain.member.entity.Member;
 import com.back.domain.member.repository.MemberRepository;
+import com.back.domain.post.post.controller.ApiV1PostController;
 import com.back.domain.post.post.entity.Post;
 import com.back.domain.post.post.repository.PostRepository;
 import com.back.standard.ut.Ut;
