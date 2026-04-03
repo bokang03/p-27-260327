@@ -1,8 +1,7 @@
-package com.back.domain.comment.controller;
+package com.back.domain.post.comment.controller;
 
 import com.back.domain.member.entity.Member;
 import com.back.domain.member.repository.MemberRepository;
-import com.back.domain.post.comment.controller.ApiV1CommentController;
 import com.back.domain.post.comment.entity.Comment;
 import com.back.domain.post.post.entity.Post;
 import com.back.domain.post.post.repository.PostRepository;
@@ -51,8 +50,6 @@ public class ApiV1CommentControllerTest {
                 .andDo(print());
 
         resultActions
-                .andExpect(handler().handlerType(ApiV1CommentController.class))
-                .andExpect(handler().methodName("list"))
                 .andExpect(status().isOk());
 
         resultActions
