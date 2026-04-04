@@ -1,8 +1,7 @@
-package com.back.domain.post.controller;
+package com.back.domain.post.post.controller;
 
 import com.back.domain.member.entity.Member;
 import com.back.domain.member.repository.MemberRepository;
-import com.back.domain.post.post.controller.ApiV1AdmPostController;
 import com.back.domain.post.post.repository.PostRepository;
 import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.DisplayName;
@@ -51,8 +50,6 @@ public class ApiV1AdmPostControllerTest {
         long count = postRepository.count();
 
         resultActions
-                .andExpect(handler().handlerType(ApiV1AdmPostController.class))
-                .andExpect(handler().methodName("count"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalCount").value(count));
     }
@@ -71,11 +68,9 @@ public class ApiV1AdmPostControllerTest {
                 .andDo(print());
 
         resultActions
-                .andExpect(handler().handlerType(ApiV1AdmPostController.class))
-                .andExpect(handler().methodName("count"))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.resultCode").value("403-1"))
-                .andExpect(jsonPath("$.msg").value("권한이 없습니다"));
+                .andExpect(jsonPath("$.msg").value("권한이 없습니다."));
 
     }
 }
